@@ -1,16 +1,14 @@
 package exampleconnector
 
-import (
-	"fmt"
-)
+import "fmt"
 
 type Config struct {
-	Count int `mapstructure:"count"`
+	AttributeName string `mapstructure:"attributeName"`
 }
 
 func (c *Config) Validate() error {
-	if c.Count != 0 {
-		return fmt.Errorf("our count connector should start counting from zero")
+	if c.AttributeName != "request.n" {
+		return fmt.Errorf("the attribute for the data passed through the connector needs to be 'request.n' for this tutorial ")
 	}
 	return nil
 }

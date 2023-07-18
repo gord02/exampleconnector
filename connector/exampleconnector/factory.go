@@ -9,9 +9,9 @@ import (
 )
 
 const (
-	defaultVal = 0
+	defaultVal = "request.n"
 	// this is the name used to refer to the connector in the config.yaml
-	typeStr = "exmaple"
+	typeStr = "example"
 )
 
 // NewFactory creates a factory for tailtracer connector.
@@ -25,7 +25,7 @@ func NewFactory() connector.Factory {
 
 func createDefaultConfig() component.Config {
 	return &Config{
-		Count: defaultVal,
+		AttributeName: defaultVal,
 	}
 }
 

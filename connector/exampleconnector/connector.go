@@ -2,7 +2,6 @@ package exampleconnector
 
 import (
 	"context"
-	"fmt"
 
 	"go.opentelemetry.io/collector/component"
 	"go.opentelemetry.io/collector/consumer"
@@ -15,7 +14,6 @@ import (
 type connectorImp struct {
 	config          Config
 	metricsConsumer consumer.Metrics
-	count           int
 	logger          *zap.Logger
 }
 
@@ -36,8 +34,7 @@ func (c *connectorImp) Capabilities() consumer.Capabilities {
 }
 
 func (c *connectorImp) ConsumeTraces(ctx context.Context, td ptrace.Traces) error {
-	countMetrics := pmetric.NewMetrics()
-	countMetrics.ResourceMetrics().EnsureCapacity(td.ResourceSpans().Len())
+	// // loop through the levels of spans
 	for i := 0; i < td.ResourceSpans().Len(); i++ {
 		resourceSpan := td.ResourceSpans().At(i)
 
@@ -48,17 +45,17 @@ func (c *connectorImp) ConsumeTraces(ctx context.Context, td ptrace.Traces) erro
 				span := scopeSpan.Spans().At(k)
 				attrs := span.Attributes()
 				mapping := attrs.AsRaw()
-				// counts the number of spans with the a specific attribute key
 				for key, _ := range mapping {
-					if key == "request.n" {
-						c.count++
+					if key == c.config.AttributeName {
+						// create metric only if span of trace had the specific attribute
+						metrics := pmetric.NewMetrics()
+						return c.metricsConsumer.ConsumeMetrics(ctx, metrics)
 					}
 				}
 			}
 		}
-		fmt.Println("* value of count: ", c.count)
 	}
-	return c.metricsConsumer.ConsumeMetrics(ctx, countMetrics)
+	return nil
 }
 
 // Start implements the component.Component interface.
